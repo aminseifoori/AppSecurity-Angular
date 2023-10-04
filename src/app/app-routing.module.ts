@@ -7,6 +7,7 @@ import { InternalServerErrorComponent } from './error/internal-server-error/inte
 const routes: Routes = [
   { path: 'home', component: HomeComponent }, 
   { path: 'account', loadChildren: ()=> import('./authentication/authentication.module').then(m => m.AuthenticationModule) },
+  { path: 'weather', loadChildren: ()=> import('./weather/weather.module').then(m => m.WeatherModule) },
   { path: '404', component: NotFoundComponent },
   { path: '500', component: InternalServerErrorComponent },
   { path: '', redirectTo: '/home', pathMatch: 'full' },
