@@ -7,17 +7,15 @@ import { Router } from '@angular/router';
   templateUrl: './menu.component.html',
   styleUrls: ['./menu.component.css']
 })
-export class MenuComponent implements OnInit {
+export class MenuComponent {
   public isUserAuthenticated: boolean;
 
-  constructor(private authService: AuthenticationService, private router: Router) { }
-
-  ngOnInit(): void {
+  constructor(private authService: AuthenticationService, private router: Router) {
     this.authService.authChanged
-      .subscribe(res => {
-        this.isUserAuthenticated = res;
-      });
-  }
+    .subscribe(res => {
+      this.isUserAuthenticated = res;
+    });
+   }
 
   public logout = () => {
     this.authService.logout();

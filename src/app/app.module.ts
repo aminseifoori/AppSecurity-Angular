@@ -12,9 +12,11 @@ import { JwtModule } from '@auth0/angular-jwt';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { WeatherModule } from './weather/weather.module';
 import { ErrorHandlerService } from './shared/services/error-handler.service';
+import { AdminPanelComponent } from './admin-panel/admin-panel.component';
+import { PermissionComponent } from './error/permission/permission.component';
 
 export function tokenGetter() {
-  return localStorage.getItem("jwt");
+  return localStorage.getItem("token");
 }
 
 @NgModule({
@@ -23,7 +25,9 @@ export function tokenGetter() {
     MenuComponent,
     HomeComponent,
     NotFoundComponent,
-    InternalServerErrorComponent
+    InternalServerErrorComponent,
+    AdminPanelComponent,
+    PermissionComponent
   ],
   imports: [
     BrowserModule,

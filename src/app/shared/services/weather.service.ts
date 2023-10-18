@@ -11,11 +11,11 @@ export class WeatherService {
   constructor(private http: HttpClient, private envUrl: EnvironmentUrlService) { }
 
   public getWeathers = () => {
-
     return this.http.get<WeatherForecast[]>(`${this.envUrl.apiURL}/WeatherForecast`, this.generateHeaders());
   }
 
   private generateHeaders = () => {
+    const token = localStorage.getItem("token");
     return {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' })
     }
