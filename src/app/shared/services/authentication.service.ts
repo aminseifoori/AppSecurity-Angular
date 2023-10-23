@@ -7,6 +7,8 @@ import { LoginDto } from '../interface/login-dto';
 import { AuthResponseDto } from '../interface/auth-response-dto';
 import { Subject } from 'rxjs';
 import { JwtHelperService } from '@auth0/angular-jwt';
+import { ForgetPasswordDto } from '../interface/forget-password-dto';
+import { ResetPasswordDto } from '../interface/reset-password-dto';
 
 @Injectable({
   providedIn: 'root'
@@ -49,6 +51,14 @@ export class AuthenticationService {
       return false;
     }
 
+  }
+
+  public forgotPassword = (body: ForgetPasswordDto) => {
+    return this.http.post(`${this.envUrl.apiURL}/api/Account/ForgotPassword`, body);
+  }
+
+  public resetPassword = (body: ResetPasswordDto) => {
+    return this.http.post(`${this.envUrl.apiURL}/api/Account/ResetPassword`, body);
   }
 
   public sendAuthStateChangeNotification = (isAuthenticated: boolean) => {
