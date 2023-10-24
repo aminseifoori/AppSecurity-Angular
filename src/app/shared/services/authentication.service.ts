@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { EnvironmentUrlService } from './environment-url.service';
 import { CreateUserDto } from '../interface/create-user-dto';
 import { RegistrationResponseDto } from '../interface/registration-response-dto';
@@ -9,6 +9,7 @@ import { Subject } from 'rxjs';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { ForgetPasswordDto } from '../interface/forget-password-dto';
 import { ResetPasswordDto } from '../interface/reset-password-dto';
+import { CustomEncoderService } from './custom-encoder.service';
 
 @Injectable({
   providedIn: 'root'
@@ -59,6 +60,13 @@ export class AuthenticationService {
 
   public resetPassword = (body: ResetPasswordDto) => {
     return this.http.post(`${this.envUrl.apiURL}/api/Account/ResetPassword`, body);
+  }
+
+  public confirmEmail = (route: string, token: string, email: string) => {
+    let params = new HttpParams({ encoder: new CustomEncoderService() })
+    params = params.append('token', token);
+    params = params.append('email', email);
+    return this.http.get(`${this.envUrl.apiURL}/api/Account/EmailConfirmation`, { params: params });
   }
 
   public sendAuthStateChangeNotification = (isAuthenticated: boolean) => {
