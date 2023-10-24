@@ -10,6 +10,7 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 import { ForgetPasswordDto } from '../interface/forget-password-dto';
 import { ResetPasswordDto } from '../interface/reset-password-dto';
 import { CustomEncoderService } from './custom-encoder.service';
+import { TwoFactorDto } from '../interface/two-factor-dto';
 
 @Injectable({
   providedIn: 'root'
@@ -71,6 +72,10 @@ export class AuthenticationService {
 
   public sendAuthStateChangeNotification = (isAuthenticated: boolean) => {
     this.authChangeSub.next(isAuthenticated);
+  }
+
+  public twoStepLogin = (body: TwoFactorDto) => {
+    return this.http.post<AuthResponseDto>(`${this.envUrl.apiURL}/api/Account/twostepverification`, body);
   }
   
   private generateHeaders = () => {
