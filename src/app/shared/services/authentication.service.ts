@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { EnvironmentUrlService } from './environment-url.service';
 import { CreateUserDto } from '../interface/create-user-dto';
 import { RegistrationResponseDto } from '../interface/registration-response-dto';
@@ -11,23 +11,33 @@ import { ForgetPasswordDto } from '../interface/forget-password-dto';
 import { ResetPasswordDto } from '../interface/reset-password-dto';
 import { CustomEncoderService } from './custom-encoder.service';
 import { TwoFactorDto } from '../interface/two-factor-dto';
+import { SocialAuthService, SocialUser } from "@abacritt/angularx-social-login";
+import { GoogleLoginProvider } from "@abacritt/angularx-social-login";
+import { ExternalAuthDto } from '../interface/external-auth-dto';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthenticationService {
-  private authChangeSub = new Subject<boolean>()
+  private authChangeSub = new Subject<boolean>();
+  public extAuthChangeSub = new Subject<SocialUser>();
   public authChanged = this.authChangeSub.asObservable();
+  public extAuthChanged = this.extAuthChangeSub.asObservable();
 
-  constructor(private http: HttpClient, private envUrl: EnvironmentUrlService, private jwtHelper: JwtHelperService) { }
+  constructor(private http: HttpClient, private envUrl: EnvironmentUrlService, private jwtHelper: JwtHelperService,
+    private externalAuthService: SocialAuthService, private router: Router) {
 
-  public isUserAuthenticated = (): boolean =>{
+  }
+
+
+  public isUserAuthenticated = (): boolean => {
     const token = localStorage.getItem("token");
     return token && !this.jwtHelper.isTokenExpired(token);
   }
 
   public registerUser = (body: CreateUserDto) => {
-    return this.http.post<RegistrationResponseDto> (`${this.envUrl.apiURL}/api/account/registration`, body, this.generateHeaders());
+    return this.http.post<RegistrationResponseDto>(`${this.envUrl.apiURL}/api/account/registration`, body, this.generateHeaders());
   }
 
   public loginUser = (body: LoginDto) => {
@@ -45,11 +55,11 @@ export class AuthenticationService {
 
   public isUserAdmin = (): boolean => {
     const token = localStorage.getItem("token");
-    if(token){
+    if (token) {
       const decodedToken = this.jwtHelper.decodeToken(token);
       const role = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']
       return role === 'Admin';
-    }else{
+    } else {
       return false;
     }
 
@@ -77,7 +87,15 @@ export class AuthenticationService {
   public twoStepLogin = (body: TwoFactorDto) => {
     return this.http.post<AuthResponseDto>(`${this.envUrl.apiURL}/api/Account/twostepverification`, body);
   }
-  
+
+  public externalLogin = (body: ExternalAuthDto) => {
+    return this.http.post<AuthResponseDto>(`${this.envUrl.apiURL}/api/Account/externallogin`, body);
+  }
+
+  public signOutExternal = () => {
+    this.externalAuthService.signOut();
+  }
+
   private generateHeaders = () => {
     return {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' })

@@ -1,6 +1,5 @@
-import { NgModule } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
 import { AuthenticationRoutingModule } from './authentication-routing.module';
 import { RegisterUserComponent } from './register-user/register-user.component';
 import { SharedModule } from '../shared/shared.module';
@@ -15,17 +14,20 @@ import { TwoStepVerificationComponent } from './two-step-verification/two-step-v
 @NgModule({
   declarations: [
     RegisterUserComponent,
-    LoginComponent,
     ForgotPasswordComponent,
     ResetPasswordComponent,
     EmailConfirmationComponent,
-    TwoStepVerificationComponent
+    TwoStepVerificationComponent,
   ],
   imports: [
     CommonModule,
     AuthenticationRoutingModule,
     SharedModule,
-    ReactiveFormsModule,
+    ReactiveFormsModule
+    
+  ],
+  providers:[
+
   ]
 })
 export class AuthenticationModule { }

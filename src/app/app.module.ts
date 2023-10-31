@@ -14,6 +14,10 @@ import { WeatherModule } from './weather/weather.module';
 import { ErrorHandlerService } from './shared/services/error-handler.service';
 import { AdminPanelComponent } from './admin-panel/admin-panel.component';
 import { PermissionComponent } from './error/permission/permission.component';
+import { GoogleLoginProvider, SocialAuthServiceConfig, SocialLoginModule } from '@abacritt/angularx-social-login';
+import { environment } from 'src/environments/environment';
+import { LoginComponent } from './authentication/login/login.component';
+import { ReactiveFormsModule } from '@angular/forms';
 
 export function tokenGetter() {
   return localStorage.getItem("token");
@@ -27,7 +31,8 @@ export function tokenGetter() {
     NotFoundComponent,
     InternalServerErrorComponent,
     AdminPanelComponent,
-    PermissionComponent
+    PermissionComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,
@@ -36,6 +41,8 @@ export function tokenGetter() {
     AuthenticationModule,
     WeatherModule,
     HttpClientModule,
+    SocialLoginModule,
+    ReactiveFormsModule,
     JwtModule.forRoot({
       config: {
         tokenGetter: tokenGetter,
@@ -49,6 +56,25 @@ export function tokenGetter() {
       provide: HTTP_INTERCEPTORS,
       useClass: ErrorHandlerService,
       multi: true
+    },
+    {
+      provide: 'SocialAuthServiceConfig',
+      useValue: {
+        autoLogin: false,
+        providers: [
+          {
+            id: GoogleLoginProvider.PROVIDER_ID,
+            provider: new GoogleLoginProvider(
+              environment.googleClientId,{
+                oneTapEnabled: false
+              }
+            )
+          }
+        ],
+        onError: (err) => {
+          console.error(err);
+        }
+      } as SocialAuthServiceConfig
     }
   ],
   bootstrap: [AppComponent]

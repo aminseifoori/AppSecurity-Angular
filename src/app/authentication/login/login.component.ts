@@ -1,8 +1,10 @@
+import { SocialAuthService, SocialUser } from '@abacritt/angularx-social-login';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthResponseDto } from 'src/app/shared/interface/auth-response-dto';
+import { ExternalAuthDto } from 'src/app/shared/interface/external-auth-dto';
 import { LoginDto } from 'src/app/shared/interface/login-dto';
 import { AuthenticationService } from 'src/app/shared/services/authentication.service';
 
@@ -18,7 +20,24 @@ export class LoginComponent implements OnInit{
   errorMessage: string = '';
   showError: boolean;
 
-  constructor(private authService: AuthenticationService, private router: Router, private route: ActivatedRoute){}
+  user: SocialUser;
+  loggedIn: boolean;
+
+  constructor(private authService: AuthenticationService, private router: Router, private route: ActivatedRoute, private socialAuthService: SocialAuthService,
+    private el: ElementRef,){
+
+    this.socialAuthService.authState.subscribe((user) => {
+      if(user){
+        this.authService.extAuthChangeSub.next(user);
+        const externalAuth: ExternalAuthDto = {
+          provider: user.provider,
+          idToken: user.idToken
+        }
+        this.validateExternalAuth(externalAuth);
+      }
+    });
+
+  }
 
   ngOnInit(): void {
     this.loginForm = new FormGroup({
@@ -26,6 +45,7 @@ export class LoginComponent implements OnInit{
       password: new FormControl("", [Validators.required])
     })
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+
   }
 
   validateControl = (controlName: string) => {
@@ -59,5 +79,23 @@ export class LoginComponent implements OnInit{
       this.showError = true;
     }})
   }
+  private validateExternalAuth(externalAuth: ExternalAuthDto) {
+    this.authService.externalLogin(externalAuth)
+      .subscribe({
+        next: (res) => {
+            localStorage.setItem("token", res.token);
+            this.authService.sendAuthStateChangeNotification(res.isAuthSuccessful);
+            this.router.navigate([this.returnUrl]);
+      },
+        error: (err: HttpErrorResponse) => {
+          this.errorMessage = err.message;
+          this.showError = true;
+          this.authService.signOutExternal();
+        }
+      });
+  }
+
+
+
 
 }

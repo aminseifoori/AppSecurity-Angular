@@ -19,6 +19,7 @@ export class MenuComponent {
 
   public logout = () => {
     this.authService.logout();
+    this.authService.signOutExternal();
     this.router.navigate(["/"]);
   }
 }
