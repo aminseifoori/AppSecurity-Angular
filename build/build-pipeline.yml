@@ -28,4 +28,4 @@ steps:
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact: drop'
   inputs:
-    PathtoPublish: 'dist/appsecurity-angular'
+    PathtoPublish: 'dist/app-security-angular'
