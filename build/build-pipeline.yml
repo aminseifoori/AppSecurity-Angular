@@ -1,5 +1,9 @@
 pool:
   name: Azure Pipelines
+trigger:
+  branches:
+    include:
+    - master  
 steps:
 - task: NodeTool@0
   displayName: 'Use Node 14.x'
@@ -24,6 +28,9 @@ steps:
     command: custom
     verbose: false
     customCommand: 'run build'
+
+- script: ls -R dist
+  displayName: 'List contents of dist directory'    
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact: drop'
